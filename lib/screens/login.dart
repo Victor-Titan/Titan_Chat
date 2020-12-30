@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:titan_chat/screens/mainscreen.dart';
 import 'package:titan_chat/services/auth.dart';
+import 'package:titan_chat/services/helperfunctions.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
 class Login extends StatefulWidget {
@@ -14,7 +16,35 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final formKey = GlobalKey<FormState>();
   AuthMethods _authMethods = new AuthMethods();
+  TextEditingController emailTextEditingController = new TextEditingController();
+  TextEditingController passwordTextEditingController = new TextEditingController();
+  HelperFunctions _helperFunctions = new HelperFunctions();
+  bool isLoading = false;
+
+  signIn(){
+    if(formKey.currentState.validate())
+      setState(() {
+        isLoading = true;
+      });
+    
+    _authMethods
+        .signInWithEmailAndPassword(
+        emailTextEditingController.text.toString(),
+        passwordTextEditingController.text.toString()
+    ).then((value) {
+      if(value!=null){
+        _helperFunctions.saveEmail(emailTextEditingController.text.toString());
+
+        Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) => Home()
+        ));
+      }
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,13 +58,29 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  decoration: textFieldInputDecoration("Email"),
-                  style: simpleTextStyle(),
-                ),
-                TextField(
-                  style: simpleTextStyle(),
-                  decoration: textFieldInputDecoration("Password")
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        validator: (val){
+                          return val.isNotEmpty ? null : "Enter correct email";
+                        },
+                        controller: emailTextEditingController,
+                        decoration: textFieldInputDecoration("Email"),
+                        style: simpleTextStyle(),
+                      ),
+                      TextFormField(
+                          obscureText: true,
+                          validator: (val){
+                            return val.length > 6 ? null : "Please provide password of atleast 6 characters";
+                          },
+                          controller: passwordTextEditingController,
+                          style: simpleTextStyle(),
+                          decoration: textFieldInputDecoration("Password")
+                      )
+                    ],
+                  ),
                 ),
                 SizedBox(height: 8),
                 Container(
@@ -47,7 +93,7 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
-
+                    signIn();
                   },
                   child: Container(
                     alignment: Alignment.center,
