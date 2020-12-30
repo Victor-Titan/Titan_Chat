@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "307260517363",
+    "project_id": "titan-chats",
+    "storage_bucket": "titan-chats.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307260517363:android:7167cd6c3dba10e28b4086",
+        "android_client_info": {
+          "package_name": "com.example.titan_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "307260517363-4s4tdtgfhl9mn8q0bou0gd39m7mf1q4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCykLpqrOIjNYm9bqRvKUK0U_pmWSN9T78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "307260517363-4s4tdtgfhl9mn8q0bou0gd39m7mf1q4q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
