@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:titan_chat/screens/chat.dart';
 import 'package:titan_chat/services/authenticate.dart';
+import 'package:titan_chat/services/helperfunctions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -8,8 +10,29 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget   {
   // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  bool userLoggedIn;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  getLoginState() async {
+    await HelperFunctions().getLogInStatus().then((value) {
+      setState(() {
+        userLoggedIn = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,7 +44,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Authenticate(),
+      home: userLoggedIn != null ? userLoggedIn ? Chat() : Authenticate() : Authenticate(),
     );
   }
 }

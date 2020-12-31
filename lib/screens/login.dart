@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:titan_chat/screens/mainscreen.dart';
 import 'package:titan_chat/services/auth.dart';
+import 'package:titan_chat/services/database.dart';
 import 'package:titan_chat/services/helperfunctions.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
@@ -18,25 +20,34 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   AuthMethods _authMethods = new AuthMethods();
+  DatabaseMethods _databaseMethods = new DatabaseMethods();
   TextEditingController emailTextEditingController = new TextEditingController();
   TextEditingController passwordTextEditingController = new TextEditingController();
   HelperFunctions _helperFunctions = new HelperFunctions();
   bool isLoading = false;
+  QuerySnapshot snapshot;
 
   signIn(){
     if(formKey.currentState.validate())
       setState(() {
         isLoading = true;
       });
-    
+
+    _databaseMethods.getByUserEmail(emailTextEditingController.text.toString())
+        .then((val) {
+        snapshot = val;
+        _helperFunctions
+            .saveEmail(snapshot.docs[0]["email"]);
+        _helperFunctions
+            .saveUserName(snapshot.docs[0]["name"]);
+    });
     _authMethods
         .signInWithEmailAndPassword(
         emailTextEditingController.text.toString(),
         passwordTextEditingController.text.toString()
     ).then((value) {
       if(value!=null){
-        _helperFunctions.saveEmail(emailTextEditingController.text.toString());
-
+        _helperFunctions.saveLogInStatus(true);
         Navigator.pushReplacement(context, MaterialPageRoute(
             builder: (context) => Home()
         ));
