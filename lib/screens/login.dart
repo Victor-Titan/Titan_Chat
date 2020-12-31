@@ -27,32 +27,37 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   QuerySnapshot snapshot;
 
-  signIn(){
-    if(formKey.currentState.validate())
-      setState(() {
-        isLoading = true;
-      });
+  signIn() {
+    if (formKey.currentState.validate()) {
+      _helperFunctions.saveEmail(emailTextEditingController.text.toString());
 
-    _databaseMethods.getByUserEmail(emailTextEditingController.text.toString())
-        .then((val) {
+      _databaseMethods.getByUserEmail(
+          emailTextEditingController.text.toString())
+          .then((val) {
         snapshot = val;
         _helperFunctions
             .saveEmail(snapshot.docs[0]["email"]);
         _helperFunctions
             .saveUserName(snapshot.docs[0]["name"]);
-    });
-    _authMethods
-        .signInWithEmailAndPassword(
-        emailTextEditingController.text.toString(),
-        passwordTextEditingController.text.toString()
-    ).then((value) {
-      if(value!=null){
-        _helperFunctions.saveLogInStatus(true);
-        Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (context) => Home()
-        ));
-      }
-    });
+      });
+
+      setState(() {
+        isLoading = true;
+      });
+
+      _authMethods
+          .signInWithEmailAndPassword(
+          emailTextEditingController.text.toString(),
+          passwordTextEditingController.text.toString()
+      ).then((value) {
+        if (value != null) {
+          _helperFunctions.saveLogInStatus(true);
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => Home()
+          ));
+        }
+      });
+    }
   }
 
 

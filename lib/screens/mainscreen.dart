@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:titan_chat/model/user.dart';
-import 'package:titan_chat/screens/login.dart';
 import 'package:titan_chat/screens/search.dart';
 import 'package:titan_chat/services/auth.dart';
 import 'package:titan_chat/services/authenticate.dart';
@@ -11,18 +10,24 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
+String _myName;
+
 class _HomeState extends State<Home> {
   AuthMethods _authMethods = new AuthMethods();
   HelperFunctions _helperFunctions = new HelperFunctions();
 
+
   @override
   void initState() {
-
+    getUserInfo();
     super.initState();
   }
 
   getUserInfo() async {
-    Usr.name = await _helperFunctions.getUserName();
+    _myName = await _helperFunctions.getUserName();
+    setState(() {
+
+    });
   }
   
   @override
