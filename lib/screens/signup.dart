@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:titan_chat/services/auth.dart';
 import 'package:titan_chat/services/database.dart';
+import 'package:titan_chat/services/helperfunctions.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
 import 'mainscreen.dart';
@@ -22,6 +23,7 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   AuthMethods authMethods = new AuthMethods();
   DatabaseMethods _databaseMethods = new DatabaseMethods();
+  HelperFunctions _helperFunctions = new HelperFunctions();
 
   signUp(){
 
@@ -30,6 +32,9 @@ class _SignUpState extends State<SignUp> {
         "name": usernameTextEditingController.text.toString(),
         "email": emailTextEditingController.text.toString()
       };
+
+      _helperFunctions.saveUserName(usernameTextEditingController.text.toString());
+      _helperFunctions.saveEmail(emailTextEditingController.text.toString());
 
       setState(() {
         isLoading = true;
