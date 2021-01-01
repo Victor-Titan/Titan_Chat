@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titan_chat/model/user.dart';
 import 'package:titan_chat/services/database.dart';
+import 'package:titan_chat/services/helperfunctions.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
 import 'chat.dart';
@@ -16,6 +18,7 @@ class _SearchState extends State<Search> {
   DatabaseMethods _databaseMethods = new DatabaseMethods();
   TextEditingController searchTextEditingController = new TextEditingController();
   QuerySnapshot searchSnapShot;
+  HelperFunctions _helperFunctions = new HelperFunctions();
 
   initSearch(){
     _databaseMethods
@@ -30,6 +33,7 @@ class _SearchState extends State<Search> {
   openChat(String username){
     if(username != Usr.name) {
       String roomId = getChatRoomId(username, Usr.name);
+      _helperFunctions.saveChatName(username);
       List<String> users = [username, Usr.name];
       Map<String, dynamic> chatRoomMap = {
         "users": users,
@@ -37,7 +41,7 @@ class _SearchState extends State<Search> {
       };
       _databaseMethods.createChatRoom(roomId, chatRoomMap);
       Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => Chat()
+          builder: (context) => Chat(username, roomId)
       ));
     } else {
       Scaffold.of(context)
@@ -158,4 +162,3 @@ getChatRoomId(String a, String b){
     return "$a\_$b";
   }
 }
-

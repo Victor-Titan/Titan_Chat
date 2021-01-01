@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:titan_chat/screens/chat.dart';
+import 'package:titan_chat/screens/mainscreen.dart';
 import 'package:titan_chat/services/authenticate.dart';
 import 'package:titan_chat/services/helperfunctions.dart';
 
@@ -45,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: userLoggedIn ? Chat() : Authenticate(),
+      home: userLoggedIn ? Home() : Authenticate(),
     );
   }
 }

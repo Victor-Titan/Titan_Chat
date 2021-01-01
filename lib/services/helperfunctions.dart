@@ -12,6 +12,11 @@ class HelperFunctions{
     return await prefs.setBool(sharedPrefIsLoggedIn, isUserLoggedIn);
   }
 
+  Future<void> saveChatName(String chatName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setString("chatName", chatName);
+  }
+
   Future<void> saveUserName(String userName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return await prefs.setString(sharedPrefUserNameKey, userName);
@@ -30,6 +35,11 @@ class HelperFunctions{
   Future<String> getUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return await prefs.getString(sharedPrefUserNameKey);
+  }
+
+  Future<String> getChatName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.getString("chatName");
   }
 
   Future<String> getEmail(String email) async {

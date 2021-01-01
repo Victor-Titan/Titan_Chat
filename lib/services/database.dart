@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 class DatabaseMethods{
 
   getByUsername(String username) async {
@@ -26,4 +24,29 @@ class DatabaseMethods{
           print(e.toString());
     });
   }
-}
+
+  addChatMessages(String roomId, Map messageMap){
+    FirebaseFirestore.instance.collection("ChatRoom")
+        .doc(roomId)
+        .collection("chats")
+        .add(messageMap).catchError((e) {
+          print(e.toString());
+    });
+  }
+  getChatMessages(String roomId) async {
+    return await FirebaseFirestore.instance.collection("ChatRoom")
+        .doc(roomId)
+        .collection("chats")
+        .orderBy("time", descending: false)
+        .snapshots();
+  }
+
+  getChatRooms(String username) async {
+    return await FirebaseFirestore.instance
+        .collection("ChatRoom")
+        .where("users", arrayContains: username)
+        .snapshots();
+  }
+
+
+  }
