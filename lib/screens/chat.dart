@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -30,11 +29,11 @@ class _ChatState extends State<Chat> {
       stream: chatMessageStream,
       builder: (context, snapshot){
         return snapshot.hasData ? ListView.builder(
-            itemCount: snapshot.data.docs.length,
+            itemCount: snapshot.data.documents.length,
             itemBuilder: (context, index) {
-              return MessageTile(snapshot.data.docs[index]["message"],
-                  snapshot.data.docs[index]["sendBy"] == Usr.name);
-            }) : Center(child: CircularProgressIndicator());
+              return MessageTile(snapshot.data.documents[index].data["message"],
+                  snapshot.data.documents[index].data["sendBy"] == Usr.name);
+            }) : Container();
       },
     );
   }

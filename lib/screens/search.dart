@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titan_chat/model/user.dart';
 import 'package:titan_chat/services/database.dart';
 import 'package:titan_chat/services/helperfunctions.dart';
@@ -85,12 +84,12 @@ class _SearchState extends State<Search> {
 
   Widget searchList(){
     return searchSnapShot != null ? ListView.builder(
-        itemCount: searchSnapShot.docs.length,
+        itemCount: searchSnapShot.documents.length,
         shrinkWrap: true,
         itemBuilder: (context, index){
           return SearchTile(
-            username: searchSnapShot.docs[index]["name"],
-            userEmail: searchSnapShot.docs[index]["email"],
+            username: searchSnapShot.documents[index].data["name"],
+            userEmail: searchSnapShot.documents[index].data["email"],
           );
         }) : Container();
   }

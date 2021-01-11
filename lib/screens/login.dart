@@ -36,9 +36,9 @@ class _LoginState extends State<Login> {
           .then((val) {
         snapshot = val;
         _helperFunctions
-            .saveEmail(snapshot.docs[0]["email"]);
+            .saveEmail(snapshot.documents[0].data["email"]);
         _helperFunctions
-            .saveUserName(snapshot.docs[0]["name"]);
+            .saveUserName(snapshot.documents[0].data["name"]);
       });
 
       setState(() {

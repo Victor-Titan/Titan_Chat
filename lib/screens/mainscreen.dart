@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:titan_chat/model/user.dart';
 import 'package:titan_chat/screens/search.dart';
 import 'package:titan_chat/services/auth.dart';
@@ -28,18 +30,31 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+  Widget chatList(){
+    return StreamBuilder(
+      stream: Firestore.instance
+      .collection("ChatRoom")
+      .where("users", arrayContains: Usr.name)
+      .snapshots(),
+      builder: (context, snapshot){
+
+      },
+    );
+  }
+
   Widget chatLists(){
     return StreamBuilder(
-      stream: chatListsStream,
+     stream: chatListsStream,
       builder: (context, snapshot){
-        return snapshot.hasData ? ListView.builder(
-            itemCount: snapshot.data.docs.length,
+        return snapshot.hasData ?
+        ListView.builder(
+            itemCount: snapshot.data.documents.length,
             itemBuilder: (context, index){
               return ChatRoomTile(
-                  snapshot.data.docs[index]["chatroomId"]
+                  snapshot.data.documents[index].data["chatroomId"]
                       .toString().replaceAll("_", "")
                       .replaceAll(Usr.name, ""),
-                  snapshot.data.docs[index]["chatroomId"]
+                  snapshot.data.documents[index].data["chatroomId"]
               );
             }) : Center(child: CircularProgressIndicator());
       },
@@ -48,13 +63,10 @@ class _HomeState extends State<Home> {
 
   getUserInfo() async {
     Usr.name = await _helperFunctions.getUserName();
-    _databaseMethods.getChatRooms(Usr.name).then((val) {
+    _databaseMethods.getChatRooms(Usr.name).then((snapshots){
       setState(() {
-        chatListsStream = val;
+        chatListsStream = snapshots;
       });
-    });
-    setState(() {
-
     });
   }
   
@@ -68,6 +80,7 @@ class _HomeState extends State<Home> {
           GestureDetector(
             onTap: () {
               _authMethods.signOut();
+              _helperFunctions.saveLogInStatus(false);
               Navigator.pushReplacement(context, MaterialPageRoute(
                 builder: (context) => Authenticate()
               ));
