@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:titan_chat/services/auth.dart';
 import 'package:titan_chat/services/database.dart';
-import 'package:titan_chat/services/helperfunctions.dart';
+import 'package:titan_chat/services/sharedpred_helper.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
 import 'mainscreen.dart';

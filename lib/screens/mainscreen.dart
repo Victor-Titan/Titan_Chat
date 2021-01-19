@@ -1,13 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:titan_chat/model/user.dart';
-import 'package:titan_chat/screens/search.dart';
+import 'package:titan_chat/screens/login.dart';
 import 'package:titan_chat/services/auth.dart';
-import 'package:titan_chat/services/authenticate.dart';
 import 'package:titan_chat/services/database.dart';
-import 'package:titan_chat/services/helperfunctions.dart';
-import 'package:titan_chat/widgets/widget.dart';
 
 import 'chat.dart';
 
@@ -18,121 +13,126 @@ class Home extends StatefulWidget {
 
 
 class _HomeState extends State<Home> {
-  AuthMethods _authMethods = new AuthMethods();
-  HelperFunctions _helperFunctions = new HelperFunctions();
-  DatabaseMethods _databaseMethods = new DatabaseMethods();
-  Stream chatListsStream;
 
-  @override
-  void initState() {
-    getUserInfo();
+  bool isSearching = false;
+  TextEditingController searchEditingController = new TextEditingController();
+  Stream userStream;
 
-    super.initState();
+
+  onSearchButtonClicked() async {
+    isSearching = true;
+    setState(() {});
+    userStream = await DatabaseMethods().getUserByUserName(searchEditingController.text);
+    setState(() {});
   }
 
-  Widget chatList(){
-    return StreamBuilder(
-      stream: Firestore.instance
-      .collection("ChatRoom")
-      .where("users", arrayContains: Usr.name)
-      .snapshots(),
-      builder: (context, snapshot){
-
+  Widget searchTile({String name, String email, String username}){
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Chat(username, name)));
       },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name),
+          Text(email)
+        ],
+      ),
     );
   }
 
-  Widget chatLists(){
+  Widget searchUsersList(){
     return StreamBuilder(
-     stream: chatListsStream,
-      builder: (context, snapshot){
-        return snapshot.hasData ?
-        ListView.builder(
-            itemCount: snapshot.data.documents.length,
+        stream: userStream,
+        builder: (context, snapshot){
+          return snapshot.hasData ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: snapshot.data.docs.length,
             itemBuilder: (context, index){
-              return ChatRoomTile(
-                  snapshot.data.documents[index].data["chatroomId"]
-                      .toString().replaceAll("_", "")
-                      .replaceAll(Usr.name, ""),
-                  snapshot.data.documents[index].data["chatroomId"]
+              DocumentSnapshot ds = snapshot.data.docs[index];
+              return searchTile(
+                  name:ds["name"],
+                  email:ds["email"],
+                  username: ds["username"]
               );
-            }) : Center(child: CircularProgressIndicator());
-      },
+            },
+          ) : Center(child:CircularProgressIndicator());
+        }
     );
   }
 
-  getUserInfo() async {
-    Usr.name = await _helperFunctions.getUserName();
-    _databaseMethods.getChatRooms(Usr.name).then((snapshots){
-      setState(() {
-        chatListsStream = snapshots;
-      });
-    });
+  Widget chatRoomsList(){
+    return Container();
   }
-  
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lists"),
-        toolbarHeight: 50,
+        title: Text("Chats"),
         actions: [
-          GestureDetector(
-            onTap: () {
-              _authMethods.signOut();
-              _helperFunctions.saveLogInStatus(false);
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) => Authenticate()
-              ));
-          },
+          InkWell(
+            onTap: (){
+              AuthMethods().signOut().then((s){
+                Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Login()));
+            });
+            },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(Icons.exit_to_app)
-            ),
+              child: Icon(Icons.exit_to_app)),
           )
         ],
       ),
-      body: chatLists(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.search),
-        onPressed: (){
-          Navigator.push(context, MaterialPageRoute(
-              builder: (context) => Search()
-          ));
-        },
-      ),
-    );
-  }
-}
-
-class ChatRoomTile extends StatelessWidget {
-  final String username;
-  final String roomId;
-  ChatRoomTile(this.username, this.roomId);
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => Chat(username,roomId)
-        ));
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Row(
+      body: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
           children: [
-            Container(
-              alignment: Alignment.center,
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(40)
-              ),
-              child: Text("${username.substring(0,1).toUpperCase()}"),
+            Row(
+              children: [
+                isSearching ? GestureDetector(
+                  onTap: (){
+                    isSearching = false;
+                    searchEditingController.clear();
+                    setState(() {});
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.arrow_back),
+                  ),
+                ) : Container(),
+
+                Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                margin: EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 1.0,
+                    style: BorderStyle.solid),
+                  borderRadius: BorderRadius.circular(24)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Search"
+                        ),
+                      )),
+                    GestureDetector(
+                      onTap: (){
+                        if(searchEditingController.text.isNotEmpty){
+                          onSearchButtonClicked();
+                        }
+                      },
+                        child: Icon(Icons.search)
+                    )
+                  ],
+                )),
+              ]
             ),
-            SizedBox(width: 8,),
-            Text(username, style: mediumTextStyle(),)
+            isSearching ? searchUsersList() : chatRoomsList()
           ],
         ),
       ),

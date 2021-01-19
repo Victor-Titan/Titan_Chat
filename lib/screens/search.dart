@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:titan_chat/model/user.dart';
 import 'package:titan_chat/services/database.dart';
-import 'package:titan_chat/services/helperfunctions.dart';
+import 'package:titan_chat/services/sharedpred_helper.dart';
 import 'package:titan_chat/widgets/widget.dart';
 
 import 'chat.dart';
