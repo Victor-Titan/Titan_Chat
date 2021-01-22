@@ -1,12 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:titan_chat/screens/chat.dart';
 import 'package:titan_chat/screens/login.dart';
 import 'package:titan_chat/screens/mainscreen.dart';
 import 'package:titan_chat/services/auth.dart';
-import 'package:titan_chat/services/authenticate.dart';
-import 'package:titan_chat/services/sharedpred_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

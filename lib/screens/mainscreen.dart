@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:titan_chat/screens/login.dart';
 import 'package:titan_chat/services/auth.dart';
 import 'package:titan_chat/services/database.dart';
+import 'package:titan_chat/services/sharedpred_helper.dart';
 
 import 'chat.dart';
 
@@ -17,7 +18,19 @@ class _HomeState extends State<Home> {
   bool isSearching = false;
   TextEditingController searchEditingController = new TextEditingController();
   Stream userStream;
+  String myName, myUserName, myEmail;
 
+  loadMyInfo() async {
+    myName = await SharedPreferenceHelper().getDisplayName();
+    myUserName = await SharedPreferenceHelper().getUserName();
+    myEmail = await SharedPreferenceHelper().getUserEmail();
+  }
+
+  @override
+  void initState() {
+    loadMyInfo();
+    super.initState();
+  }
 
   onSearchButtonClicked() async {
     isSearching = true;
@@ -26,9 +39,24 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
+  getChatRoomId(String a, String b){
+    if(a.substring(0,1).codeUnitAt(0) > b.substring(0,1).codeUnitAt(0)){
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
+
   Widget searchTile({String name, String email, String username}){
     return GestureDetector(
       onTap: (){
+        var chatRoomId = getChatRoomId(myUserName, username);
+        Map<String, dynamic> chatRoomInfoMap = {
+          "users" : [myUserName, username]
+        };
+
+        DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
+
         Navigator.push(context, MaterialPageRoute(builder: (context) => Chat(username, name)));
       },
       child: Column(
