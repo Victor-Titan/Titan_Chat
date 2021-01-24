@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:titan_chat/services/database.dart';
 import 'package:titan_chat/services/sharedpref_helper.dart';
@@ -16,16 +17,16 @@ class _ChatState extends State<Chat> {
   String myName, myProfilePic, myUserName, myEmail;
   TextEditingController messageTextEdittingController = TextEditingController();
 
-  getMyInfoFromSharedPreference() async {
+  loadData() async {
     myName = await SharedPreferenceHelper().getDisplayName();
     myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
     myUserName = await SharedPreferenceHelper().getUserName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
 
-    chatRoomId = getChatRoomIdByUsernames(widget.chatWithUsername, myUserName);
+    chatRoomId = getChatRoomId(widget.chatWithUsername, myUserName);
   }
 
-  getChatRoomIdByUsernames(String a, String b) {
+  getChatRoomId(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
       return "$b\_$a";
     } else {
@@ -33,12 +34,11 @@ class _ChatState extends State<Chat> {
     }
   }
 
-  addMessage(bool sendClicked) {
+  sendMessage(bool sendClicked) {
     if (messageTextEdittingController.text != "") {
       String message = messageTextEdittingController.text;
 
       var lastMessageTs = DateTime.now();
-
       Map<String, dynamic> messageInfoMap = {
         "message": message,
         "sendBy": myUserName,
@@ -63,7 +63,6 @@ class _ChatState extends State<Chat> {
         DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
 
         if (sendClicked) {
-          // remove the text in the message input field
           messageTextEdittingController.text = "";
           // make message id blank to get regenerated on next message send
           messageId = "";
@@ -72,37 +71,54 @@ class _ChatState extends State<Chat> {
     }
   }
 
-  Widget chatMessageTile(String message, bool sendByMe, dynamic time) {
+  Widget messageTile(String message, bool sendByMe, Timestamp time) {
+    DateTime dT = time.toDate();
+    String now = DateFormat('kk:mm:a').format(dT) + " ${dT.day.toString()}/${dT.month.toString()}/${dT.year.toString().substring(2)}";
     return Row(
       mainAxisAlignment:
       sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        Flexible(
-          child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  bottomRight:
-                  sendByMe ? Radius.circular(0) : Radius.circular(24),
-                  topRight: Radius.circular(24),
-                  bottomLeft:
-                  sendByMe ? Radius.circular(24) : Radius.circular(0),
-                ),
-                color: sendByMe ? Colors.blue : Color(0xfff1f0f0),
-              ),
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children:[
-                  Container(
-
-                    child: Text(
-                      message,
-                      style: TextStyle(color: sendByMe ? Colors.white : Colors.black, fontSize: 20),
-                    ),
+        GestureDetector(
+          onDoubleTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context){
+                return AlertDialog(
+                  title: Text("Time Stamp"),
+                  content: Text(now),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Close")
+                    )
+                  ],
+                );
+              }
+            );
+          },
+          child: Flexible(
+            child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    bottomRight:
+                    sendByMe ? Radius.circular(0) : Radius.circular(24),
+                    topRight: Radius.circular(24),
+                    bottomLeft:
+                    sendByMe ? Radius.circular(24) : Radius.circular(0),
                   ),
-                ]
-              )),
+                  color: sendByMe ? Colors.blue : Color(0xfff1f0f0),
+                ),
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  message,
+                  style: TextStyle(color: sendByMe ? Colors.white : Colors.black, fontSize: 20),
+                )
+            ),
+          ),
         ),
       ],
     );
@@ -119,7 +135,7 @@ class _ChatState extends State<Chat> {
             reverse: true,
             itemBuilder: (context, index) {
               DocumentSnapshot ds = snapshot.data.docs[index];
-              return chatMessageTile(
+              return messageTile(
                 ds["message"],
                 myUserName == ds["sendBy"],
                 ds["ts"]
@@ -130,19 +146,19 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  getAndSetMessages() async {
+  loadMessages() async {
     messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
     setState(() {});
   }
 
-  doThisOnLaunch() async {
-    await getMyInfoFromSharedPreference();
-    getAndSetMessages();
+  onInit() async {
+    await loadData();
+    loadMessages();
   }
 
   @override
   void initState() {
-    doThisOnLaunch();
+    onInit();
     super.initState();
   }
 
@@ -175,7 +191,7 @@ class _ChatState extends State<Chat> {
                         )),
                     GestureDetector(
                       onTap: () {
-                        addMessage(true);
+                        sendMessage(true);
                       },
                       child: Icon(
                         Icons.send,

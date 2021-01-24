@@ -19,9 +19,10 @@ class _LoginState extends State<Login> {
             AuthMethods().signInWithGoogle(context);
           },
           child: Container(
+            height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              color: Color(0xffDB4437),
+              color: Colors.blueAccent,
             ),
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
