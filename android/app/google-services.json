@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "307260517363-0smkgp6sv5pd59145ajufhd2652jhdir.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.titan_chat",
+            "certificate_hash": "3311e1e7a0007cbd130a9b2293eb6c0534512cc5"
+          }
+        },
+        {
           "client_id": "307260517363-4s4tdtgfhl9mn8q0bou0gd39m7mf1q4q.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "307260517363-4s4tdtgfhl9mn8q0bou0gd39m7mf1q4q.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "307260517363-9tutsbn65dbdtrbh0lbcqltqbsok9r96.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.titanChat"
+              }
             }
           ]
         }
